@@ -25,9 +25,11 @@
 
 4. Копируем файл конфигурации для kubectl
 
-`$ mkdir -p $HOME/.kube`
-`$ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config`
-`$ sudo chown $(id -u):$(id -g) $HOME/.kube/config`
+```
+$ mkdir -p $HOME/.kube
+$ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+$ sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
 
 5. Настраиваем сеть. **Внимание! В файле kube-flannel.yml указан интерфейс enp0s8.** Если в виртуальной машине он называется по-другому (допустим, enp1s2), то нужно выполнить команду
 
