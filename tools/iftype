@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Credits to
+# https://unix.stackexchange.com/questions/272850/how-to-determine-the-logical-type-of-a-linux-network-device
+
+# Arguments: $1: Interface ('grep'-regexp).
+
+# Static list of types (from `ip link help`):
+TYPES=(bond bond_slave bridge dummy gre gretap ifb ip6gre ip6gretap ip6tnl ipip ipoib ipvlan macvlan macvtap nlmon sit vcan veth vlan vti vxlan tun tap)
+
+iface="$1"
+
+for type in "${TYPES[@]}"; do
+  ip link show type "${type}" | grep -E '^[0-9]+:' | cut -d ':' -f 2 | sed 's|^[[:space:]]*||' | while read _if; do
+    echo "${_if}:${type}"
+  done | grep "^${iface}"
+done
+
