@@ -1,0 +1,5 @@
+#!/bin/bash
+
+if [[ $EUID -ne 0 ]]; then echo "root required" 1>&2; exit 1; fi
+
+./ns0 | sort -k 1n | uniq -w 20

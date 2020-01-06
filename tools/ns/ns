@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# credits to
+# https://unix.stackexchange.com/questions/505112/how-do-i-find-all-interfaces-that-have-been-configured-in-linux-including-those/505978#505978
+
+if [[ $EUID -ne 0 ]]; then echo "root required" 1>&2; exit 1; fi
+
+./ns1 | ./ns2

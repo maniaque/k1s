@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [[ $EUID -ne 0 ]]; then echo "root required" 1>&2; exit 1; fi
+
+echo -n 'INIT NETWORK: ' ; stat -L -c %i /proc/1/ns/net
+echo ''
+
+while read -r inode reference; do
+    echo "network $inode"
+    if nsenter --net="$reference" ip -br address show 2>/dev/null; then
+        echo ''
+    fi
+done

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [[ $EUID -ne 0 ]]; then echo "root required" 1>&2; exit 1; fi
+
+lsns -n -u -t net -o NS,PATH | while read inode path; do printf '%20u %s\n' $inode "$path"; done
+
+awk '$3 == "nsfs" { print $2 }' /proc/mounts | while read -r mount; do
+        stat -c '%20i %n' "$mount"
+done
+
+find /proc/ -mindepth 1 -maxdepth 1 -name '[1-9]*' | while read -r procpid; do
+        find $procpid/fd -mindepth 1 | while read -r procfd; do
+                if [ "$(stat -f -c %T $procfd)" = nsfs ]; then
+                        stat -L -c '%20i %n' $procfd
+                fi
+        done
+done 2>/dev/null
