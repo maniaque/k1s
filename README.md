@@ -37,7 +37,7 @@ $ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 6. Устанавливаем Flannel
 
-`kubectl -f apply kube-flannel.yml`
+`kubectl apply -f kube-flannel.yml`
 
 ## Присоединение ноды
 
