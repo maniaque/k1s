@@ -1,0 +1,11 @@
+#!/bin/bash
+
+IP="192.168.56.110"
+
+if [[ $EUID -ne 0 ]]; then echo "root required" 1>&2; exit 1; fi
+
+cat << EOF > /etc/default/kubelet
+KUBELET_EXTRA_ARGS="--node-ip=$IP"
+EOF
+
+# Вот сюда можно вставить команду kubeadm join
