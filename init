@@ -17,3 +17,4 @@ cat << EOF > /etc/default/kubelet
 KUBELET_EXTRA_ARGS="--node-ip=$IP"
 EOF
 
+systemctl restart kubelet
