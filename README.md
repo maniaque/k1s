@@ -31,15 +31,11 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
-5. Разрешаем запускать рабочую нагрузку на нашей единственной ноде
-
-`kubectl taint nodes --all node-role.kubernetes.io/master-`
-
-6. Настраиваем сеть. **Внимание! В файле kube-flannel.yml указан интерфейс enp0s8.** Если в виртуальной машине он называется по-другому (допустим, enp1s2), то нужно выполнить команду
+5. Настраиваем сеть. **Внимание! В файле kube-flannel.yml указан интерфейс enp0s8.** Если в виртуальной машине он называется по-другому (допустим, enp1s2), то нужно выполнить команду
 
 `sed -i s/enp0s8/enp1s2/g kube-flannel.yml`
 
-7. Устанавливаем Flannel
+6. Устанавливаем Flannel
 
 `kubectl apply -f kube-flannel.yml`
 
