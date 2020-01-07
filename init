@@ -11,8 +11,6 @@ kubeadm init \
 
 # NOTE: Без --pod-network-cidr=10.244.0.0/16 не взлетит flannel
 
-kubectl taint nodes --all node-role.kubernetes.io/master-
-
 cat << EOF > /etc/default/kubelet
 KUBELET_EXTRA_ARGS="--node-ip=$IP"
 EOF
