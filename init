@@ -1,15 +1,36 @@
 #!/bin/bash
 
-IP="192.168.56.110"
-
 if [[ $EUID -ne 0 ]]; then echo "root required" 1>&2; exit 1; fi
+
+USER=$SUDO_USER
+KUBE=$(eval echo "~$USER")/.kube
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 <interface>"
+  echo "Interfaces found (UP only):"
+  ip a | grep --color=never UP
+  exit 255;
+fi
+
+IP=$(ip -4 addr show $1 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+
+if [ -z "$IP" ]; then
+  echo "No IPv4 found on $1" 1>&2;
+  exit 1;
+fi
+
+# NOTE: We need --pod-network-cidr=10.244.0.0/16 for any networking plugin to function
 
 kubeadm init \
 --apiserver-advertise-address=$IP \
 --pod-network-cidr=10.244.0.0/16 \
---ignore-preflight-errors=NumCPU
+--ignore-preflight-errors=NumCPU \
+--token=k1s-static-token
 
-# NOTE: Без --pod-network-cidr=10.244.0.0/16 не взлетит flannel
+if [ $? -ne 0 ]; then
+  echo "kubeadm not found or failed" 1>&2;
+  exit 2;
+fi
 
 KUBECONFIG=/etc/kubernetes/admin.conf kubectl taint nodes --all node-role.kubernetes.io/master-
 rm -rf $HOME/.kube
@@ -19,3 +40,7 @@ KUBELET_EXTRA_ARGS="--node-ip=$IP"
 EOF
 
 systemctl restart kubelet
+
+mkdir -p $KUBE
+cp -i /etc/kubernetes/admin.conf $KUBE/config
+chown -R $USER:$(id -gn $USER) $KUBE
