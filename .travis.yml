@@ -6,5 +6,6 @@ addons:
       - iproute2
 install: sudo ./install
 script:
-  - ip a
+  - IFACE=$(ip r | grep '^default' | grep -o 'dev .* proto' | cut -d' '  -f2)
+  - echo $IFACE
 # deploy: sudo ./init 
