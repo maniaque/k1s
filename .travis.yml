@@ -4,8 +4,7 @@ addons:
   apt:
     packages:
       - iproute2
-install: sudo ./install
+# install: sudo ./install
 script:
-  - IFACE=$(ip r | grep '^default' | grep -o 'dev .* proto' | cut -d' '  -f2)
-  - echo $IFACE
-# deploy: sudo ./init 
+  - echo $(ip r | grep '^default' | grep -o 'dev .* proto' | cut -d' '  -f2)
+# deploy: sudo ./init $(ip r | grep '^default' | grep -o 'dev .* proto' | cut -d' '  -f2)
