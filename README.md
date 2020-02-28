@@ -1,3 +1,5 @@
+[English version](README.en.md) is also available.
+
 ## Что это?
 Набор скриптов для того, чтобы быстро поднять простенький кластер Kubernetes.
 Cеть может быть Flannel или Calico, на выбор.
