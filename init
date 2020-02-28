@@ -2,8 +2,10 @@
 
 if [[ $EUID -ne 0 ]]; then echo "root required" 1>&2; exit 1; fi
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 USER=$SUDO_USER
 KUBE=$(eval echo "~$USER")/.kube
+POD_CIDR=10.244.0.0/16
 
 if [ -z "$1" ]; then
   echo "Usage: $0 <interface>"
@@ -19,13 +21,13 @@ if [ -z "$IP" ]; then
   exit 1;
 fi
 
-# NOTE: We need --pod-network-cidr=10.244.0.0/16 for any networking plugin to function
+# NOTE: We need --pod-network-cidr=<...> for any networking plugin to function
 
 kubeadm init \
 --apiserver-advertise-address=$IP \
---pod-network-cidr=10.244.0.0/16 \
+--pod-network-cidr=$POD_CIDR \
 --ignore-preflight-errors=NumCPU \
---token=k1s-static-token
+--token=abcdef.k1s0static0token
 
 if [ $? -ne 0 ]; then
   echo "kubeadm not found or failed" 1>&2;
@@ -35,12 +37,21 @@ fi
 KUBECONFIG=/etc/kubernetes/admin.conf kubectl taint nodes --all node-role.kubernetes.io/master-
 rm -rf $HOME/.kube
 
+# append IP address to kubeletet configuration
 cat << EOF > /etc/default/kubelet
 KUBELET_EXTRA_ARGS="--node-ip=$IP"
 EOF
 
 systemctl restart kubelet
 
+# copy and chown config to access cluster
 mkdir -p $KUBE
 cp -i /etc/kubernetes/admin.conf $KUBE/config
 chown -R $USER:$(id -gn $USER) $KUBE
+
+# flannel
+sed -i s/{{interface}}/$1/g $DIR/network/flannel.yml
+sed -i -e "s?{{pod_cidr}}?$POD_CIDR?g" $DIR/network/flannel.yml
+
+# calico
+sed -i -e "s?{{pod_cidr}}?$POD_CIDR?g" $DIR/network/calico.yaml

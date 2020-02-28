@@ -1,11 +1,24 @@
 #!/bin/bash
 
-IP="192.168.56.120"
-
 if [[ $EUID -ne 0 ]]; then echo "root required" 1>&2; exit 1; fi
+
+if [ -z "$1" ] || [ -z "$2" ]; then
+  echo "Usage: $0 <interface> <endpoint>, eg $0 eth0 192.168.56.110:6443"
+  echo "Interfaces found (UP only):"
+  ip a | grep --color=never UP
+
+  exit 255;
+fi
+
+IP=$(ip -4 addr show $1 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+
+if [ -z "$IP" ]; then
+  echo "No IPv4 found on $1" 1>&2;
+  exit 1;
+fi
 
 cat << EOF > /etc/default/kubelet
 KUBELET_EXTRA_ARGS="--node-ip=$IP"
 EOF
 
-# Вот сюда можно вставить команду kubeadm join
+kubeadm join $2 --token abcdef.k1s0static0token --discovery-token-unsafe-skip-ca-verification
