@@ -1,0 +1,10 @@
+dist: xenial
+language: generic
+addons:
+  apt:
+    packages:
+      - iproute2
+install:
+  - sudo ./install
+script:
+  - sudo ./init $(ip r | grep '^default' | grep -o 'dev .*' | cut -d' '  -f2)

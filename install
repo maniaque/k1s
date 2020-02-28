@@ -2,16 +2,16 @@
 
 if [[ $EUID -ne 0 ]]; then echo "root required" 1>&2; exit 1; fi
 
-apt update
+apt-get update
 
-apt install -qy docker.io gnupg2 apt-transport-https curl
+apt-get install -qy docker.io gnupg2 apt-transport-https curl
 
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
+echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
 
-apt update
+apt-get update
 
-apt install -qy kubelet kubeadm kubernetes-cni
+apt-get install -qy kubelet kubeadm kubernetes-cni
 apt-mark hold kubelet kubeadm kubectl
 
 swapoff -a
