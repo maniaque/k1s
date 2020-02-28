@@ -7,5 +7,5 @@ addons:
 # install: sudo ./install
 script:
   # - echo $(ip r | grep '^default' | grep -o 'dev .* proto' | cut -d' '  -f2)
-  - echo $(ip r | grep '^default')
+  - echo $(ip r | grep '^default' | grep -o 'dev .*' | cut -d' '  -f2)
 # deploy: sudo ./init $(ip r | grep '^default' | grep -o 'dev .* proto' | cut -d' '  -f2)
