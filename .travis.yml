@@ -1,3 +1,10 @@
 dist: xenial
 language: generic
+addons:
+  apt:
+    packages:
+      - iproute2
 install: sudo ./install
+script:
+  - ip a
+# deploy: sudo ./init 
