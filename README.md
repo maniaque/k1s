@@ -42,7 +42,7 @@ Cеть может быть Flannel или Calico, на выбор.
 
 ### Для Calico
 
-`kubectl apply -f network/calico.yaml`
+`kubectl apply -f network/calico.yml`
 
 
 ## Присоединение ноды

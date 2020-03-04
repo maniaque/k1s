@@ -1,0 +1,44 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$network = ENV["NETWORK"] || "flannel"
+
+$ip = "192.168.33.110"
+
+$script = <<SCRIPT
+apt-get update
+apt-get install -qy git
+
+git clone https://github.com/maniaque/k1s.git
+
+cd k1s
+
+./install
+
+./init $(ip a | grep "#{$ip}" | grep -o \"[^ ]\\+$\")
+
+KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f network/"#{$network}".yml
+
+rm -rf ~/.kube
+
+echo 'Done! Please run'
+echo "vagrant ssh -c 'cat /home/vagrant/.kube/config' > ~/.kube/config"
+echo 'to get config file of your cluster, or use "vagrant ssh" and kubectl'
+SCRIPT
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/bionic64"
+
+  config.vm.define "k1s" do |i|
+    i.vm.hostname = "k1s"
+    i.vm.network "private_network", ip: $ip
+  end
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+    vb.name = "k1s"
+    vb.cpus = 2
+  end
+
+  config.vm.provision "shell", inline: $script  
+end
