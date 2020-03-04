@@ -39,7 +39,7 @@ To create cluster run it with interface name parameter:
 
 ### Calico
 
-`kubectl apply -f network/calico.yaml`
+`kubectl apply -f network/calico.yml`
 
 ## Joining a node
 
