@@ -54,4 +54,4 @@ sed -i s/{{interface}}/$1/g $DIR/network/flannel.yml
 sed -i -e "s?{{pod_cidr}}?$POD_CIDR?g" $DIR/network/flannel.yml
 
 # calico
-sed -i -e "s?{{pod_cidr}}?$POD_CIDR?g" $DIR/network/calico.yaml
+sed -i -e "s?{{pod_cidr}}?$POD_CIDR?g" $DIR/network/calico.yml
