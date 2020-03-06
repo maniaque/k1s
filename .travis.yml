@@ -8,7 +8,7 @@ install:
   - sudo ./install
 script:
   - sudo ./init $(ip r | grep '^default' | grep -o 'dev .*' | cut -d' '  -f2)
-  - KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f network/$NETWORK.yml
+  - KUBECONFIG=/etc/kubernetes/admin.conf sudo kubectl apply -f network/$NETWORK.yml
 env:
   - NETWORK="flannel"
   - NETWORK="calico"
