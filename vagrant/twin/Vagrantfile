@@ -1,0 +1,78 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+NAME_MASTER="k1s-master"
+NAME_NODE="k1s-node"
+
+$network = ENV["NETWORK"] || "flannel"
+
+$ip_master = "192.168.33.110"
+$ip_node = "192.168.33.120"
+
+$provision_common = <<SCRIPT
+apt-get update
+apt-get install -qy git
+
+git clone https://github.com/maniaque/k1s.git
+SCRIPT
+
+$provision_master = <<SCRIPT
+cd k1s
+
+./install
+
+./init $(ip a | grep "#{$ip_master}" | grep -o \"[^ ]\\+$\")
+
+KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f network/"#{$network}".yml
+
+rm -rf ~/.kube
+SCRIPT
+
+$provision_node = <<SCRIPT
+cd k1s
+
+./install
+
+./join $(ip a | grep "#{$ip_node}" | grep -o \"[^ ]\\+$\") #{$ip_master}:6443
+
+echo 'Done! Joined.'
+SCRIPT
+
+$provision_message = <<SCRIPT
+echo 'Done! Please run'
+echo "vagrant ssh #{NAME_MASTER} -c 'cat /home/vagrant/.kube/config' > ~/.kube/config"
+echo 'to get config file of your cluster, or use "vagrant ssh" and kubectl'
+SCRIPT
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/bionic64"
+
+  config.vm.define NAME_MASTER do |master|
+    master.vm.hostname = NAME_MASTER
+    master.vm.network "private_network", ip: $ip_master
+
+    master.vm.provider "virtualbox" do |vb|
+      vb.memory = "2048"
+      vb.name = NAME_MASTER
+      vb.cpus = 2
+    end
+
+    master.vm.provision "shell", inline: $provision_master
+  end
+
+  config.vm.define NAME_NODE do |node|
+    node.vm.hostname = NAME_NODE
+    node.vm.network "private_network", ip: $ip_node
+
+    node.vm.provider "virtualbox" do |vb|
+      vb.memory = "2048"
+      vb.name = NAME_NODE
+      vb.cpus = 2
+    end
+
+    node.vm.provision "shell", inline: $provision_node
+    node.vm.provision "shell", inline: $provision_message
+  end
+
+  config.vm.provision "shell", inline: $provision_common
+end
