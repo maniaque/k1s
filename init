@@ -2,17 +2,6 @@
 
 if [[ $EUID -ne 0 ]]; then echo "root required" 1>&2; exit 1; fi
 
-ADMINCONF="/etc/kubernetes/admin.conf"
-if [ -f "$ADMINCONF" ]; then
-  echo "$ADMINCONF exists, init already done";
-  exit 0;
-fi
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-USER=$SUDO_USER
-KUBE=$(eval echo "~$USER")/.kube
-POD_CIDR=10.244.0.0/16
-
 if [ -z "$1" ]; then
   echo "Usage: $0 <interface>"
   echo "Interfaces found (UP only):"
@@ -20,11 +9,32 @@ if [ -z "$1" ]; then
   exit 255;
 fi
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+USER=$SUDO_USER
+KUBE=$(eval echo "~$USER")/.kube
+POD_CIDR=10.244.0.0/16
+
 IP=$(ip -4 addr show $1 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
 
 if [ -z "$IP" ]; then
   echo "No IPv4 found on $1" 1>&2;
   exit 1;
+fi
+
+# generate network settings
+
+# flannel
+sed -i s/{{interface}}/$1/g $DIR/network/flannel.yml
+sed -i -e "s?{{pod_cidr}}?$POD_CIDR?g" $DIR/network/flannel.yml
+
+# calico
+sed -i -e "s?{{pod_cidr}}?$POD_CIDR?g" $DIR/network/calico.yml
+
+# check for second run
+ADMINCONF="/etc/kubernetes/admin.conf"
+if [ -f "$ADMINCONF" ]; then
+  echo "$ADMINCONF exists, init already done";
+  exit 0;
 fi
 
 # NOTE: We need --pod-network-cidr=<...> for any networking plugin to function
@@ -54,10 +64,3 @@ systemctl restart kubelet
 mkdir -p $KUBE
 cp -i /etc/kubernetes/admin.conf $KUBE/config
 chown -R $USER:$(id -gn $USER) $KUBE
-
-# flannel
-sed -i s/{{interface}}/$1/g $DIR/network/flannel.yml
-sed -i -e "s?{{pod_cidr}}?$POD_CIDR?g" $DIR/network/flannel.yml
-
-# calico
-sed -i -e "s?{{pod_cidr}}?$POD_CIDR?g" $DIR/network/calico.yml
