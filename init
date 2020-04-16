@@ -2,6 +2,12 @@
 
 if [[ $EUID -ne 0 ]]; then echo "root required" 1>&2; exit 1; fi
 
+ADMINCONF="/etc/kubernetes/admin.conf"
+if [ -f "$ADMINCONF" ]; then
+  echo "$ADMINCONF exists, init already done";
+  exit 0;
+fi
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 USER=$SUDO_USER
 KUBE=$(eval echo "~$USER")/.kube
