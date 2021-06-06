@@ -1,2 +1,7 @@
 vagrant/single/*
 vagrant/twin/*
+.envrc
+.kubeconfig
+.vagrant/*
+*.swp
+*.log
