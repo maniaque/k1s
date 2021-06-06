@@ -11,6 +11,13 @@ Each virtual machine is implied to have two network adapters:
 
 This is not a requirement! If a virtual machine could have Internet access and LAN on the same adapter (NAT Network in VirtualBox), this would be fine.
 
+## Using Vagrant
+
+You can run the cluster on Linux as described below or use Vagrant:
+
+* `vagrant/single` - single node kubernetes cluster in Vagrant
+* `vagrant/twin` - two node kubernetes cluster in Vagrant (master + worker)
+
 ## Creating cluster
 
 1. Install required packages and hold versions:
