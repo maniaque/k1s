@@ -1,7 +1,15 @@
 vagrant/single/*
 vagrant/twin/*
-.envrc
-.kubeconfig
 .vagrant/*
-*.swp
 *.log
+
+# direnv.net configs
+.envrc
+
+# temporary configs
+/Vagrantfile
+.kubeconfig
+
+# editor temporary files
+*.swp
+*~
