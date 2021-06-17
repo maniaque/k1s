@@ -3,7 +3,7 @@ This is a bunch of scripts to fire up small Kubernetes cluster with Calico or Fl
 
 Suggested environment:
 * virtual machine (VirtualBox or something like)
-* Ubuntu 18.04
+* Ubuntu 20.04
 
 Each virtual machine is implied to have two network adapters:
 * NAT (for Internet access)
