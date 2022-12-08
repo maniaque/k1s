@@ -45,14 +45,14 @@ echo 'to get config file of your cluster, or use "vagrant ssh" and kubectl'
 SCRIPT
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/bionic64"
+  config.vm.box = "ubuntu/focal64"
 
   config.vm.define NAME_MASTER do |master|
     master.vm.hostname = NAME_MASTER
     master.vm.network "private_network", ip: $ip_master
 
     master.vm.provider "virtualbox" do |vb|
-      vb.memory = "2048"
+      vb.memory = "4096"
       vb.name = NAME_MASTER
       vb.cpus = 2
     end
@@ -65,7 +65,7 @@ Vagrant.configure("2") do |config|
     node.vm.network "private_network", ip: $ip_node
 
     node.vm.provider "virtualbox" do |vb|
-      vb.memory = "2048"
+      vb.memory = "4096"
       vb.name = NAME_NODE
       vb.cpus = 2
     end
