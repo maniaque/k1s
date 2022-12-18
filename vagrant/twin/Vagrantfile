@@ -5,6 +5,7 @@ NAME_MASTER="k1s-master"
 NAME_NODE="k1s-node"
 
 $network = ENV["NETWORK"] || "flannel"
+$version = ENV["VERSION"] || "1.25.5-00"
 
 $ip_master = "192.168.33.110"
 $ip_node = "192.168.33.120"
@@ -19,7 +20,7 @@ SCRIPT
 $provision_master = <<SCRIPT
 cd k1s
 
-./install
+./install #{$version}
 
 ./init $(ip a | grep "#{$ip_master}" | grep -o \"[^ ]\\+$\")
 
@@ -31,7 +32,7 @@ SCRIPT
 $provision_node = <<SCRIPT
 cd k1s
 
-./install
+./install #{$version}
 
 ./join $(ip a | grep "#{$ip_node}" | grep -o \"[^ ]\\+$\") #{$ip_master}:6443
 
@@ -45,7 +46,7 @@ echo 'to get config file of your cluster, or use "vagrant ssh" and kubectl'
 SCRIPT
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/focal64"
+  config.vm.box = "ubuntu/jammy64"
 
   config.vm.define NAME_MASTER do |master|
     master.vm.hostname = NAME_MASTER
